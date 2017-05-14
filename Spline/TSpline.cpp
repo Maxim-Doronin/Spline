@@ -1,12 +1,5 @@
 #include "TSpline.h"
 
-double calculateFunction(double x)
-{
-	double result = pow(x, 5) - 3 * pow(x, 4) - 10 * pow(x, 3) + 50 * x*x + 100 * x;
-	result /= (x*x + 2 * x + 2);
-	return result;
-}
-
 TSpline::TSpline()
 {
 	splines = NULL;
@@ -17,7 +10,7 @@ TSpline::~TSpline()
 	freeMemory();
 }
 
-void TSpline::buildSplines(const double *x, const double *y, int n)
+void TSpline::buildSplines(const double *x, const double *y, const int& n)
 {
 	freeMemory();
 	pointsCount = n;
@@ -25,9 +18,9 @@ void TSpline::buildSplines(const double *x, const double *y, int n)
 	for (int i = 0; i < pointsCount; i++)
 	{
 		splines[i].x = x[i];
-		splines[i].a = y[i];
+		splines[i].A = y[i];
 	}
-	splines[0].c = splines[pointsCount - 1].c = 0.0;
+	splines[0].C = splines[pointsCount - 1].C = 0.0;
 
 	double *alpha = new double[n - 1];
 	double *beta = new double[n - 1];
@@ -48,21 +41,21 @@ void TSpline::buildSplines(const double *x, const double *y, int n)
 
 	for (int i = pointsCount - 2; i > 0; --i)
 	{
-		splines[i].c = alpha[i] * splines[i + 1].c + beta[i];
+		splines[i].C = alpha[i] * splines[i + 1].C + beta[i];
 	}
 
 	for (int i = pointsCount - 1; i > 0; --i)
 	{
 		double h_i = x[i] - x[i - 1];
-		splines[i].d = (splines[i].c - splines[i - 1].c) / h_i;
-		splines[i].b = h_i * (2.0 * splines[i].c + splines[i - 1].c) / 6.0 + (y[i] - y[i - 1]) / h_i;
+		splines[i].D = (splines[i].C - splines[i - 1].C) / h_i;
+		splines[i].B = h_i * (2.0 * splines[i].C + splines[i - 1].C) / 6.0 + (y[i] - y[i - 1]) / h_i;
 	}
 
 	delete[] beta;
 	delete[] alpha;
 }
 
-double TSpline::getInterpolatedFunctionValue(double arg)
+double TSpline::getInterpolatedFunctionValue(const double& arg)
 {
 	if (!splines)
 	{
@@ -95,7 +88,7 @@ double TSpline::getInterpolatedFunctionValue(double arg)
 		}
 	}
 	double dx = (arg - s->x);
-	return s->a + (s->b + (s->c / 2.0 + s->d * dx / 6.0) * dx) * dx;
+	return s->A + (s->B + (s->C / 2.0 + s->D * dx / 6.0) * dx) * dx;
 }
 
 void TSpline::freeMemory()
@@ -105,4 +98,11 @@ void TSpline::freeMemory()
 		delete[] splines;
 		splines = NULL;
 	}
+}
+
+double calculateFunction(double x)
+{
+	double result = pow(x, 5) - 3 * pow(x, 4) - 10 * pow(x, 3) + 50 * x*x + 100 * x;
+	result /= (x*x + 2 * x + 2);
+	return result;
 }
