@@ -12,7 +12,7 @@ class TSpline
 private:
 	struct splineVariables
 	{
-		double a, b, c, d, x;
+		double A, B, C, D, x;
 	};
 
 	splineVariables *splines;
@@ -22,8 +22,8 @@ private:
 public:
 	TSpline();
 	~TSpline();
-	void buildSplines(const double *x, const double *y, int n);
-	double getInterpolatedFunctionValue(double arg);
+	void buildSplines(const double *x, const double *y, const int& n);
+	double getInterpolatedFunctionValue(const double& arg);
 };
 
 double calculateFunction(double x);
